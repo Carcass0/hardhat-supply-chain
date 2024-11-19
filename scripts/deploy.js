@@ -3,17 +3,15 @@ const fs = require("fs");
 const path = require("path");
 require("dotenv").config();
 
-
 async function main() {
-    // Get the contract factory
+    // Получение фабрики контракта
     const Logistics = await ethers.getContractFactory("Logistics");
 
-    // Deploy the contract with initial funds
-    const logistics = await Logistics.deploy({ value: ethers.parseEther("10") }); // Use ethers.utils.parseEther
-
+    // Деплой контракта с начальным балансом
+    const logistics = await Logistics.deploy({ value: ethers.parseEther("10") });
     await logistics.waitForDeployment();
 
-    console.log("Logistics contract deployed to:", await logistics.getAddress());
+    console.log("Контракт Logistics развернут по адресу:", await logistics.getAddress());
 
     const envPath = path.resolve(__dirname, "../.env");
     
@@ -22,14 +20,14 @@ async function main() {
         envContent = fs.readFileSync(envPath, "utf8");
     }
 
-    // Update or add the ADDRESS property
+    // Обновление или добавление свойства ADDRESS
     const updatedEnvContent = envContent
         .split("\n")
         .filter((line) => !line.startsWith("ADDRESS="))
         .concat(`ADDRESS=${await logistics.getAddress()}`)
         .join("\n");
 
-    // Write the updated content back to the .env file
+    // Запись обновленного содержимого обратно в файл .env
     fs.writeFileSync(envPath, updatedEnvContent);
 }
 
